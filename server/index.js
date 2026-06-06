@@ -3,6 +3,7 @@ const cors = require("cors");
 const config = require("./config");
 const { connectMongo } = require("./services/mongoService");
 const authRoute = require("./routes/authRoute");
+const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
 
@@ -40,10 +41,6 @@ start().catch((err) => {
   process.exit(1);
 });
 
-// app.get("/api/health", (req, res) => {
-//   res.status(200).json({ status: "ok", message: "Nyaya Sahayak API is running" });
-// });
-
-app.use("/api", authRoute); // <-- Added here
-// app.use(errorHandler);
+app.use("/api", authRoute); 
+app.use(errorHandler);
 
