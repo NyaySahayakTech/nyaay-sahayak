@@ -1,5 +1,7 @@
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
+const jwt = require("jsonwebtoken");
+const config = require("../config");
 
 function normalizeEmail(email) {
     return String(email || "").trim().toLowerCase();
@@ -110,7 +112,23 @@ async function login({ email, password }) {
     return toPublicUser(user);
 }
 
+//JWT
+function issueToken(user) {
+    return jwt.sign(
+        {
+            userId: user.id,
+            email: user.email,
+            name: user.name,
+        },
+        config.JWT_SECRET,
+        {
+            expiresIn: config.JWT_EXPIRES_IN,
+        }
+    );
+}
+
 module.exports = {
     signup,
     login,
+    issueToken,
 };
