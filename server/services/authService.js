@@ -1,5 +1,7 @@
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
+const jwt = require("jsonwebtoken");
+const config = require("../config");
 
 function normalizeEmail(email) {
     return String(email || "").trim().toLowerCase();
@@ -18,21 +20,34 @@ function toPublicUser(user) {
                 : user.createdAt,
     };
 }
+// sign up
 async function signup({ name, email, password }) {
     const safeName = String(name || "").trim();
     const safeEmail = normalizeEmail(email);
     const safePassword = String(password || "");
 
     if (!safeName || safeName.length < 2) {
-        throw new Error("Name must be at least 2 characters long.");
+        const error = new Error(
+            "Name must be at least 2 characters long."
+        );
+        error.statusCode = 400;
+        throw error;
     }
 
     if (!safeEmail || !safeEmail.includes("@")) {
-        throw new Error("Please provide a valid email address.");
+        const error = new Error(
+            "Please provide a valid email address."
+        );
+        error.statusCode = 400;
+        throw error;
     }
 
     if (safePassword.length < 6) {
-        throw new Error("Password must be at least 6 characters long.");
+        const error = new Error(
+            "Password must be at least 6 characters long."
+        );
+        error.statusCode = 400;
+        throw error;
     }
 
     const existingUser = await User.findOne({ email: safeEmail }).lean();
@@ -55,6 +70,65 @@ async function signup({ name, email, password }) {
     return toPublicUser(user);
 }
 
+//log in 
+
+async function login({ email, password }) {
+    const safeEmail = normalizeEmail(email);
+    const safePassword = String(password || "");
+
+    if (!safeEmail || !safePassword) {
+        const error = new Error(
+            "Email and password are required."
+        );
+        error.statusCode = 400;
+        throw error;
+    }
+    
+    const user = await User.findOne({
+        email: safeEmail,
+    });
+    
+    if (!user || !user.passwordHash) {
+        const error = new Error(
+            "Invalid email or password."
+        );
+        error.statusCode = 401;
+        throw error;
+    }
+    
+    const ok = await bcrypt.compare(
+        safePassword,
+        user.passwordHash
+    );
+    
+    if (!ok) {
+        const error = new Error(
+            "Invalid email or password."
+        );
+        error.statusCode = 401;
+        throw error;
+    }
+    
+    return toPublicUser(user);
+}
+
+//JWT
+function issueToken(user) {
+    return jwt.sign(
+        {
+            userId: user.id,
+            email: user.email,
+            name: user.name,
+        },
+        config.JWT_SECRET,
+        {
+            expiresIn: config.JWT_EXPIRES_IN,
+        }
+    );
+}
+
 module.exports = {
     signup,
+    login,
+    issueToken,
 };

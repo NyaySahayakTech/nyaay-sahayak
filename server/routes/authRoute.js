@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
 
-const { signup } = require("../services/authService");
+const { signup, login, issueToken, } = require("../services/authService");
 
-router.post("/signup", async (req, res) => {
+router.post("/signup", async (req, res, next) => {
     try {
         const user = await signup(req.body);
 
@@ -12,10 +12,23 @@ router.post("/signup", async (req, res) => {
             user,
         });
     } catch (error) {
-        res.status(error.statusCode || 500).json({
-            success: false,
-            message: error.message,
+        next(error);
+    }
+});
+
+router.post("/login", async (req, res, next) => {
+    try {
+        const user = await login(req.body);
+
+        const token = issueToken(user);
+
+        res.status(200).json({
+            success: true,
+            token,
+            user,
         });
+    } catch (error) {
+        next(error);
     }
 });
 
