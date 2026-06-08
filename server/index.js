@@ -4,16 +4,20 @@ const config = require("./config");
 const { connectMongo } = require("./services/mongoService");
 const authRoute = require("./routes/authRoute");
 const errorHandler = require("./middleware/errorHandler");
+const uploadRoute = require("./routes/uploadRoute");
 
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json({ limit: "5mb" }));
+app.use("/api", uploadRoute);
 
 // Basic Health Route
 app.get("/api/health", (req, res) => {
-  res.status(200).json({ status: "ok", message: "Nyaya Sahayak API is running" });
+  res
+    .status(200)
+    .json({ status: "ok", message: "Nyaya Sahayak API is running" });
 });
 
 // Start Server and Connect Database
@@ -41,6 +45,5 @@ start().catch((err) => {
   process.exit(1);
 });
 
-app.use("/api", authRoute); 
+app.use("/api", authRoute);
 app.use(errorHandler);
-
