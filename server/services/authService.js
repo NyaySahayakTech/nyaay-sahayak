@@ -126,9 +126,16 @@ function issueToken(user) {
         }
     );
 }
+function verifyToken(token) {
+    return jwt.verify(
+        token,
+        config.JWT_SECRET
+    );
+}
 
 module.exports = {
     signup,
     login,
     issueToken,
+    verifyToken,
 };
