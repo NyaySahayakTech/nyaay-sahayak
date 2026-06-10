@@ -6,6 +6,7 @@ const authRoute = require("./routes/authRoute");
 const errorHandler = require("./middleware/errorHandler");
 const passport = require("passport");
 require("./passport/googleStrategy");
+const uploadRoute = require("./routes/uploadRoute");
 
 const app = express();
 
@@ -15,10 +16,13 @@ app.use(express.json({ limit: "5mb" }));
 app.use(passport.initialize());
 app.use("/api", authRoute);
 app.use(errorHandler);
+app.use("/api", uploadRoute);
 
 // Basic Health Route
 app.get("/api/health", (req, res) => {
-  res.status(200).json({ status: "ok", message: "Nyaya Sahayak API is running" });
+  res
+    .status(200)
+    .json({ status: "ok", message: "Nyaya Sahayak API is running" });
 });
 
 // Start Server and Connect Database
@@ -45,6 +49,5 @@ start().catch((err) => {
   console.error("Failed to start server:", err);
   process.exit(1);
 });
-
 
 
