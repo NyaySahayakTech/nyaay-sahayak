@@ -4,12 +4,17 @@ const config = require("./config");
 const { connectMongo } = require("./services/mongoService");
 const authRoute = require("./routes/authRoute");
 const errorHandler = require("./middleware/errorHandler");
+const passport = require("passport");
+require("./passport/googleStrategy");
 
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json({ limit: "5mb" }));
+app.use(passport.initialize());
+app.use("/api", authRoute);
+app.use(errorHandler);
 
 // Basic Health Route
 app.get("/api/health", (req, res) => {
@@ -41,6 +46,5 @@ start().catch((err) => {
   process.exit(1);
 });
 
-app.use("/api", authRoute); 
-app.use(errorHandler);
+
 

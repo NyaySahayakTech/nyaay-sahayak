@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const passport = require("passport");
+const { findOrCreateGoogleUser,} = require("../services/googleAuthService");
 
 const { signup, login, issueToken, getUserById, } = require("../services/authService");
 const authenticate = require("../middleware/authMiddleware");
@@ -34,6 +36,52 @@ router.post("/login", async (req, res, next) => {
         next(error);
     }
 });
+//Google login Start
+router.get(
+    "/auth/google",
+    passport.authenticate(
+        "google",
+        {
+            scope: [
+                "profile",
+                "email",
+            ],
+        }
+    )
+);
+//Google Callback
+router.get(
+    "/auth/google/callback",
+
+    passport.authenticate(
+        "google",
+        {
+            session: false,
+        }
+    ),
+
+    async (req, res, next) => {
+        try {
+
+            const user =
+                await findOrCreateGoogleUser(
+                    req.user
+                );
+
+            const token =
+                issueToken(user);
+
+            res.status(200).json({
+                success: true,
+                token,
+                user,
+            });
+
+        } catch (error) {
+            next(error);
+        }
+    }
+);
 
 router.post("/logout", (req, res) => {
     res.status(200).json({
