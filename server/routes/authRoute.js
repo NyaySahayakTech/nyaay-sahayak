@@ -4,7 +4,7 @@ const passport = require("passport");
 const { findOrCreateGoogleUser,} = require("../services/googleAuthService");
 
 const { signup, login, issueToken, getUserById, } = require("../services/authService");
-const authenticate = require("../middleware/authMiddleware");
+const authenticate = require("../middleware/authenticate");
 
 router.post("/signup", async (req, res, next) => {
     try {
