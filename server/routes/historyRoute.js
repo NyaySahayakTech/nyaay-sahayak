@@ -1,37 +1,72 @@
 const express = require("express");
 const router = express.Router();
 
-router.get("/history", async (req, res, next) => {
-    try {
-        res.status(200).json({
-            success: true,
-            message: "Get history route reached",
-        });
-    } catch (error) {
-        next(error);
-    }
-});
+const authenticate = require("../middleware/authenticate");
 
-router.get("/history/:id", async (req, res, next) => {
-    try {
-        res.status(200).json({
-            success: true,
-            message: "Get history by id route reached",
-        });
-    } catch (error) {
-        next(error);
-    }
-});
+const {
+    getUserHistory,
+    getHistoryById,
+    deleteHistory,
+} = require("../services/historyService");
 
-router.delete("/history/:id", async (req, res, next) => {
-    try {
-        res.status(200).json({
-            success: true,
-            message: "Delete history route reached",
-        });
-    } catch (error) {
-        next(error);
+router.get(
+    "/history",
+    authenticate,
+    async (req, res, next) => {
+        try {
+            const history =
+                await getUserHistory(
+                    req.user.userId
+                );
+
+            res.status(200).json({
+                success: true,
+                history,
+            });
+        } catch (error) {
+            next(error);
+        }
     }
-});
+);
+
+router.get(
+    "/history/:id",
+    authenticate,
+    async (req, res, next) => {
+        try {
+            const history =
+                await getHistoryById(
+                    req.params.id
+                );
+
+            res.status(200).json({
+                success: true,
+                history,
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+);
+
+router.delete(
+    "/history/:id",
+    authenticate,
+    async (req, res, next) => {
+        try {
+            await deleteHistory(
+                req.params.id
+            );
+
+            res.status(200).json({
+                success: true,
+                message:
+                    "History deleted successfully",
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+);
 
 module.exports = router;
