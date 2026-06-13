@@ -16,7 +16,7 @@ const upload = multer({
     const mime = String(file.mimetype || "").toLowerCase();
     const hasPdfExtension = /\.pdf$/i.test(String(file.originalname || ""));
 
-    if (allowedPdfMimeTypes.has(mime) || hasPdfExtension) {
+    if (allowedPdfMimeTypes.has(mime) && hasPdfExtension) {
       cb(null, true);
     } else {
       cb(new Error("Only PDF files are accepted"), false);
