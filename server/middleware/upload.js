@@ -19,7 +19,9 @@ const upload = multer({
     if (allowedPdfMimeTypes.has(mime) && hasPdfExtension) {
       cb(null, true);
     } else {
-      cb(new Error("Only PDF files are accepted"), false);
+      const err = new Error("Only PDF files are accepted");
+      err.statusCode = 415;
+      cb(err, false);
     }
   },
 });
