@@ -3,6 +3,7 @@ const cors = require("cors");
 const config = require("./config");
 const { connectMongo } = require("./services/mongoService");
 const historyRoute = require("./routes/historyRoute");
+const analyzeRoute = require("./routes/analyzeRoute");
 
 
 const app = express();
@@ -11,6 +12,7 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: "5mb" }));
 app.use("/api", historyRoute);
+app.use("/api", analyzeRoute);
 
 // Basic Health Route
 app.get("/api/health", (req, res) => {
