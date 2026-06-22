@@ -4,6 +4,19 @@ from config.settings import TOP_K
 
 embeddings = SentenceTransformerEmbeddings()
 
+PROPERTY_KEYWORDS = [
+    "land",
+    "property",
+    "plot",
+    "house",
+    "flat",
+    "tenant",
+    "rent",
+    "boundary",
+    "possession",
+    "encroachment"
+]
+
 
 def retrieve_documents(query, index_name):
     vector_store = load_index(
@@ -17,3 +30,24 @@ def retrieve_documents(query, index_name):
     )
 
     return results
+
+def auto_detect_retrieve(query):
+    q = query.lower()
+
+    for word in PROPERTY_KEYWORDS:
+        if word in q:
+            return (
+                "property",
+                retrieve_documents(
+                    query,
+                    "property"
+                )
+            )
+
+    return (
+        "general",
+        retrieve_documents(
+            query,
+            "general"
+        )
+    )
