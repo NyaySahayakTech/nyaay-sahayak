@@ -6,6 +6,7 @@ const { connectMongo } = require("./services/mongoService");
 const authRoute = require("./routes/authRoute");
 const uploadRoute = require("./routes/uploadRoute");
 const historyRoute = require("./routes/historyRoute");
+const analyzeRoute = require("./routes/analyzeRoute");
 
 const errorHandler = require("./middleware/errorHandler");
 
@@ -23,6 +24,7 @@ app.use(passport.initialize());
 app.use("/api", authRoute);
 app.use("/api", uploadRoute);
 app.use("/api", historyRoute);
+app.use("/api", analyzeRoute);
 
 app.use(errorHandler);
 // Basic Health Route
