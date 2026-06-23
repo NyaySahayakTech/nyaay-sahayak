@@ -27,11 +27,21 @@ router.post("/analyze", authenticate, upload.single("file"), async (req, res, ne
     if (caseText.length < 50) {
       return res.status(400).json({ error: "Case description is too short (min 50 chars)." });
     }
-    const analysis = {
-      summary: "This is a mock AI response.",
-      legalReasoning: "We successfully extracted your text! Now we need to build the Python RAG service to process it.",
-      extractedTextPreview: caseText.substring(0, 150) + "..."
-    };
+    // Send data to Python FastAPI server
+    const pythonResponse = await fetch("http://127.0.0.1:5000/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: caseText })
+    });
+
+    if (!pythonResponse.ok) {
+      const errorData = await pythonResponse.json();
+      throw new Error(errorData.detail || "Failed to analyze text from Python API");
+    }
+
+    // Get the real AI response from Python
+    const analysis = await pythonResponse.json();
+
 
     try {
       await saveHistory({
