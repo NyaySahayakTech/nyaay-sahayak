@@ -1,6 +1,5 @@
 from langchain_core.prompts import ChatPromptTemplate
 
-
 LEGAL_PROMPT = ChatPromptTemplate.from_template(
     """
 You are Nyaay Sahayak, a highly precise AI legal research assistant specializing in Indian legal matters.
@@ -42,21 +41,21 @@ No extra text.
 
 Generate JSON exactly like this:
 
-{
+{{
     "analysis": "...",
 
     "summary": "...",
 
     "legalProvisions": [
-        {
+        {{
             "section": "...",
             "act": "...",
             "relevance": "..."
-        }
+        }}
     ],
 
     "similarCases": [
-        {
+        {{
             "caseTitle": "...",
             "year": "...",
             "caseNumber": "...",
@@ -65,12 +64,12 @@ Generate JSON exactly like this:
             "similarityScore": 90,
             "keyParallels": "...",
             "decision": "Brief 1-2 sentence summary."
-        }
+        }}
     ],
 
     "disclaimer":
     "This response is AI-generated legal research and informational assistance only. It is not legal advice and should not be treated as a substitute for consultation with a qualified legal professional."
-}
+}}
 
 </instructions>
 """
