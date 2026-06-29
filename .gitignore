@@ -14,3 +14,10 @@ env/
 coverage/
 # VS Code
 .vscode/
+# 
+venv/
+__pycache__/
+*.pyc
+.env
+faiss_index/
+.vscode/
