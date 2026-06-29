@@ -1,7 +1,10 @@
 langchain
 langchain-community
 langchain-google-genai
+
+
 langchain-core
+
 langchain-text-splitters
 faiss-cpu
 sentence-transformers
@@ -10,7 +13,9 @@ uvicorn
 google-generativeai
 python-dotenv
 
-pydantic
-
 
 pydantic
+
+=========
+pydantic
+
