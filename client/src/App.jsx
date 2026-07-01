@@ -1,15 +1,21 @@
 import React, { useContext, useState, useEffect } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import Layout from './components/Layout'
 import Home from './pages/Home'
 import Analyze from './pages/Analyze'
 import History from './pages/History'
 import Login from './pages/Login'
+import Dashboard from './pages/Dashboard'
 import { AuthContext } from './context/AuthContext'
+import { fetchHistory } from './api/historyApi'
 
 function App() {
   const { user, token, loading, logout } = useContext(AuthContext);
   const [isDark, setIsDark] = useState(false);
+  const [history, setHistory] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [quoteSeed] = useState(() => Date.now());
+  const navigate = useNavigate();
 
   // Initialize theme configuration from local storage
   useEffect(() => {
@@ -32,8 +38,33 @@ function App() {
     }
   }, [isDark]);
 
+  // Load analysis history when authenticated
+  useEffect(() => {
+    const loadHistory = async () => {
+      if (token) {
+        setHistoryLoading(true);
+        try {
+          const list = await fetchHistory(token);
+          setHistory(list);
+        } catch (err) {
+          console.error("Failed to load history:", err);
+        } finally {
+          setHistoryLoading(false);
+        }
+      } else {
+        setHistory([]);
+      }
+    };
+    loadHistory();
+  }, [token]);
+
   const toggleTheme = () => {
     setIsDark((prev) => !prev);
+  };
+
+  const handleHistorySelect = (item) => {
+    // Navigate to analyze and pass the history item details in the route state
+    navigate('/analyze', { state: { selectedCase: item } });
   };
 
   if (loading) {
@@ -48,7 +79,17 @@ function App() {
     <Layout user={user} onLogout={logout} isDark={isDark} onToggleTheme={toggleTheme}>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
+        <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
+        <Route path="/dashboard" element={
+          user ? (
+            <Dashboard
+              user={user}
+              quoteSeed={quoteSeed}
+              history={history}
+              onSelect={handleHistorySelect}
+            />
+          ) : <Navigate to="/login" replace />
+        } />
         <Route path="/analyze" element={user ? <Analyze /> : <Navigate to="/login" replace />} />
         <Route path="/history" element={user ? <History /> : <Navigate to="/login" replace />} />
         <Route path="*" element={<Navigate to="/" replace />} />
