@@ -1,6 +1,6 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
-import Navbar from './components/Navbar'
+import Layout from './components/Layout'
 import Home from './pages/Home'
 import Analyze from './pages/Analyze'
 import History from './pages/History'
@@ -8,30 +8,52 @@ import Login from './pages/Login'
 import { AuthContext } from './context/AuthContext'
 
 function App() {
-  const { user, loading } = useContext(AuthContext);
+  const { user, token, loading, logout } = useContext(AuthContext);
+  const [isDark, setIsDark] = useState(false);
+
+  // Initialize theme configuration from local storage
+  useEffect(() => {
+    const cachedTheme = localStorage.getItem('nyay_theme');
+    if (cachedTheme === 'dark') {
+      setIsDark(true);
+    } else if (!cachedTheme && window.matchMedia?.('(prefers-color-scheme: dark)').matches) {
+      setIsDark(true);
+    }
+  }, []);
+
+  // Update theme class on HTML document root element
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('nyay_theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('nyay_theme', 'light');
+    }
+  }, [isDark]);
+
+  const toggleTheme = () => {
+    setIsDark((prev) => !prev);
+  };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen flex items-center justify-center bg-background transition-colors duration-300">
         <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <Navbar /> 
-
-      <main className="flex-1">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
-          <Route path="/analyze" element={user ? <Analyze /> : <Navigate to="/login" replace />} />
-          <Route path="/history" element={user ? <History /> : <Navigate to="/login" replace />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </main>
-    </div>
+    <Layout user={user} onLogout={logout} isDark={isDark} onToggleTheme={toggleTheme}>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
+        <Route path="/analyze" element={user ? <Analyze /> : <Navigate to="/login" replace />} />
+        <Route path="/history" element={user ? <History /> : <Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Layout>
   )
 }
 
