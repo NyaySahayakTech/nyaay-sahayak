@@ -1,37 +1,36 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
+import { loginUser } from '../api/authApi';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const navigate = useNavigate(); // Page change karne ke liye
-    const { login } = useContext(AuthContext); // context
+    const navigate = useNavigate();
+    const { login } = useContext(AuthContext);
 
     const handleSubmit = async (e) => {
-        e.preventDefault(); // Page ko refresh hone se rokta hai
+        e.preventDefault();
         setError('');
+        setLoading(true);
 
         try {
-            // Node.js backend ko request 
-            const response = await axios.post('http://localhost:3000/api/auth/login', {
-                email,
-                password
-            });
+            const data = await loginUser({ email, password });
 
-            // Agar success hua, toh token save karo aur context update karo
-            localStorage.setItem('token', response.data.token);
-            login(response.data.user);
-
-            // Login hote hi direct to home page
-            navigate('/');
-
+            if (data.success) {
+                login(data.user, data.token);
+                navigate('/');
+            } else {
+                setError(data.message || 'Login failed!');
+            }
         } catch (err) {
-            setError('Login failed! Please check your email or password.');
+            setError(err.response?.data?.error || 'Login failed! Please check your email or password.');
             console.error(err);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -56,6 +55,7 @@ const Login = () => {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
+                            disabled={loading}
                         />
                     </div>
 
@@ -68,14 +68,16 @@ const Login = () => {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
+                            disabled={loading}
                         />
                     </div>
 
                     <button
                         type="submit"
-                        className="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors shadow-md"
+                        disabled={loading}
+                        className="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors shadow-md disabled:bg-gray-400"
                     >
-                        Sign In
+                        {loading ? 'Signing In...' : 'Sign In'}
                     </button>
                 </form>
             </div>
