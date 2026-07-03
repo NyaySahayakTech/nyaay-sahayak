@@ -91,7 +91,15 @@ function App() {
           ) : <Navigate to="/login" replace />
         } />
         <Route path="/analyze" element={user ? <Analyze /> : <Navigate to="/login" replace />} />
-        <Route path="/history" element={user ? <History /> : <Navigate to="/login" replace />} />
+        <Route path="/history" element={
+          user ? (
+            <History
+              history={history}
+              onSelect={handleHistorySelect}
+              setHistory={setHistory}
+            />
+          ) : <Navigate to="/login" replace />
+        } />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>
