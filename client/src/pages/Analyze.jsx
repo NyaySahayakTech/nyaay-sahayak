@@ -4,7 +4,7 @@ import axios from 'axios';
 import API_BASE from '../api/config';
 import InputPanel from '../components/InputPanel';
 import AnalyzingLoader from '../components/AnalyzingLoader';
-import ResultsPanel from '../components/ResultsPanel';
+import ResultsPanel from '../components/ResultPanel';
 
 const Analyze = () => {
   const [loading, setLoading] = useState(false);
