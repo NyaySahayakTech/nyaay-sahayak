@@ -4,15 +4,19 @@ const GoogleStrategy =
 
 const config = require("../config");
 
+// Fallback to placeholder strings to prevent startup crash if Google OAuth is not configured in .env
+const clientID = config.GOOGLE_CLIENT_ID || "placeholder-client-id";
+const clientSecret = config.GOOGLE_CLIENT_SECRET || "placeholder-client-secret";
+
 passport.use(
     new GoogleStrategy(
         {
-            clientID: config.GOOGLE_CLIENT_ID,
-            clientSecret: config.GOOGLE_CLIENT_SECRET,
+            clientID: clientID,
+            clientSecret: clientSecret,
             callbackURL: "/api/auth/google/callback",
         },
 
-        async (accessToken, refreshToken, profile, done ) => {
+        async (accessToken, refreshToken, profile, done) => {
             try {
                 return done(
                     null,
