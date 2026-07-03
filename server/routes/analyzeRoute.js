@@ -45,7 +45,7 @@ router.post("/analyze", authenticate, upload.single("file"), async (req, res, ne
 
     try {
       await saveHistory({
-        userId: req.user.id,
+        userId: req.user.userId,
         caseText,
         inputType,
         analysis,
@@ -57,7 +57,7 @@ router.post("/analyze", authenticate, upload.single("file"), async (req, res, ne
     res.json(analysis);
 
   } catch (err) {
-    next(err); 
+    next(err);
   }
 });
 
